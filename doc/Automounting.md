@@ -36,36 +36,36 @@ If you have another account you can mount it specifying the label after the `#` 
 
 ## Mount using systemd
 
-1) Create unit file `sudo nano /etc/systemd/system/google-drive-ocamlfuse.service` content (be sure to replace instances of {username}, {label}, and {mountpoint}):
+1) Create unit file `nano ~/.config/systemd/user/home-<USERNAME>-<mountpoint>.mount`
 
 ```bash
 [Unit]
-Description=FUSE filesystem over Google Drive
-After=network.target
+Description=Mount Work Google Drive
+After=network-online.target
+Wants=network-online.target
 
-[Service]
-User={username}
-Group={username}
-ExecStart=google-drive-ocamlfuse -label {label} {mountpoint}
-ExecStop=fusermount -u {mountpoint}
-Restart=always
-Type=forking
+[Mount]
+What=google-drive-ocamlfuse
+Where=/home/<USERNAME>/<MOUNTPOINT>
+Type=fuse.google-drive-ocamlfuse
+Options=rw,nosuid,_netdev
+TimeoutSec=5
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 ```
 
 2. To mount drive:
 ```
-    sudo systemctl start google-drive-ocamlfuse.service
+    sudo systemctl start --user home-<USERNAME>-<mountpoint>.mount
 ```
 3. To unmount drive:
 ```
-    sudo systemctl stop google-drive-ocamlfuse.service
+    sudo systemctl stop --user home-<USERNAME>-<mountpoint>.mount
 ```
-4. To automount on boot:
+4. To automount on login:
 ```
-    sudo systemctl enable google-drive-ocamlfuse.service
+    sudo systemctl enable --user home-<USERNAME>-<mountpoint>.mount
 ```
 ## Mount using pam_mount
 
